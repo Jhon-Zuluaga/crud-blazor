@@ -10,6 +10,8 @@ builder.Services.AddRazorComponents()
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
+builder.Services.AddScoped<SupplierService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

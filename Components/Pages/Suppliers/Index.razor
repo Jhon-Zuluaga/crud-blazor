@@ -1,0 +1,82 @@
+@page "/suppliers"
+@rendermode InteractiveServer
+@inject SupplierService Servicio
+@inject IJSRuntime JS
+
+<PageTitle>Proveedores</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Proveedores</h1>
+    <a class="btn btn-primary" href="suppliers/crear">Nuevo proveedor</a>
+</div>
+
+<input class="form-control mb-3" placeholder="Buscar por nombre..."
+       @bind="busqueda" @bind:event="oninput" @bind:after="CargarAsync" />
+
+@if (error is not null)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+@if (suppliers is null)
+{
+    <p><em>Cargando...</em></p>
+}
+else if (suppliers.Count == 0)
+{
+    <p>No hay proveedores para mostrar.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Contacto</th>
+                <th>Teléfono</th>
+                <th>Correo</th>
+                <th>Estado</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in suppliers)
+            {
+                <tr>
+                    <td>@p.Name</td>
+                    <td>@p.Contact</td>
+                    <td>@p.Phone</td>
+                    <td>@p.Email</td>
+                    <td>
+                        <span class="badge @(p.Active ? "bg-success" : "bg-secondary")">
+                            @(p.Active ? "Activo" : "Inactivo")
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-primary" href="suppliers/editar/@p.Id">Editar</a>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => EliminarAsync(p)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Supplier>? suppliers;
+    private string? busqueda;
+    private string? error;
+
+    protected override async Task OnInitializedAsync() => await CargarAsync();
+
+    private async Task CargarAsync() => suppliers = await Servicio.ListAsync(busqueda);
+
+    private async Task EliminarAsync(Supplier p)
+    {
+        if (!await JS.InvokeAsync<bool>("confirm", $"¿Eliminar a {p.Name}?"))
+            return;
+
+        error = await Servicio.DeleteAsync(p.Id);
+        await CargarAsync();
+    }
+}
