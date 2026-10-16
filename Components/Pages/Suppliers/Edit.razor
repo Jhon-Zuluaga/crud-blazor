@@ -1,0 +1,42 @@
+@page "/suppliers/editar/{Id:int}"
+@rendermode InteractiveServer
+@inject SupplierService Servicio
+@inject NavigationManager Nav
+
+<PageTitle>Editar proveedor</PageTitle>
+<h1>Editar proveedor</h1>
+
+@if (!cargado)
+{
+    <p><em>Cargando...</em></p>
+}
+else if (supplier is null)
+{
+    <div class="alert alert-warning">Proveedor no encontrado.</div>
+    <a href="suppliers">Volver al listado</a>
+}
+else
+{
+    <SupplierForm Modelo="supplier" OnGuardar="GuardarAsync" OnCancelar="Volver" />
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Supplier? supplier;
+    private bool cargado;
+
+    protected override async Task OnInitializedAsync()
+    {
+        supplier = await Servicio.GetAsync(Id);
+        cargado = true;
+    }
+
+    private async Task GuardarAsync()
+    {
+        await Servicio.UpdateAsync(supplier!);
+        Volver();
+    }
+
+    private void Volver() => Nav.NavigateTo("/suppliers");
+}

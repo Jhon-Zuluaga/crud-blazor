@@ -1,0 +1,47 @@
+<EditForm Model="Modelo" OnValidSubmit="OnGuardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="text-danger" />
+
+    <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <InputText class="form-control" @bind-Value="Modelo.Name" />
+        <ValidationMessage For="() => Modelo.Name" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Contacto</label>
+        <InputText class="form-control" @bind-Value="Modelo.Contact" />
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Teléfono</label>
+            <InputText class="form-control" @bind-Value="Modelo.Phone" />
+            <ValidationMessage For="() => Modelo.Phone" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Correo</label>
+            <InputText class="form-control" @bind-Value="Modelo.Email" />
+            <ValidationMessage For="() => Modelo.Email" />
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Dirección</label>
+        <InputText class="form-control" @bind-Value="Modelo.Address" />
+    </div>
+
+    <div class="form-check mb-3">
+        <InputCheckbox class="form-check-input" id="activo" @bind-Value="Modelo.Active" />
+        <label class="form-check-label" for="activo">Activo</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="button" class="btn btn-secondary" @onclick="OnCancelar">Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired] public Supplier Modelo { get; set; } = default!;
+    [Parameter] public EventCallback OnGuardar { get; set; }
+    [Parameter] public EventCallback OnCancelar { get; set; }
+}

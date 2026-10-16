@@ -1,0 +1,21 @@
+@page "/suppliers/crear"
+@rendermode InteractiveServer
+@inject SupplierService Servicio
+@inject NavigationManager Nav
+
+<PageTitle>Nuevo proveedor</PageTitle>
+<h1>Nuevo proveedor</h1>
+
+<SupplierForm Modelo="supplier" OnGuardar="GuardarAsync" OnCancelar="Volver" />
+
+@code {
+    private readonly Supplier supplier = new();
+
+    private async Task GuardarAsync()
+    {
+        await Servicio.CreateAsync(supplier);
+        Volver();
+    }
+
+    private void Volver() => Nav.NavigateTo("/suppliers");
+}
