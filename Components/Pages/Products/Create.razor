@@ -1,0 +1,26 @@
+@page "/products/crear"
+@rendermode InteractiveServer
+@inject ProductService Servicio
+@inject NavigationManager Nav
+
+<PageTitle>Nuevo producto</PageTitle>
+<h1>Nuevo producto</h1>
+@if (error is not null)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<ProductForm Modelo="product" OnGuardar="GuardarAsync" OnCancelar="Volver" />
+
+@code {
+    private readonly Product product = new();
+    private string? error;
+
+    private async Task GuardarAsync()
+    {
+        error = await Servicio.CreateAsync(product);
+        if (error is null) Volver();
+    }
+
+    private void Volver() => Nav.NavigateTo("/products");
+}

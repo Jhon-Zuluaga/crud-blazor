@@ -1,0 +1,48 @@
+@page "/products/editar/{Id:int}"
+@rendermode InteractiveServer
+@inject ProductService Servicio
+@inject NavigationManager Nav
+
+<PageTitle>Editar producto</PageTitle>
+<h1>Editar producto</h1>
+
+@if (error is not null)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+@if (!cargado)
+{
+    <p><em>Cargando...</em></p>
+}
+else if (product is null)
+{
+    <div class="alert alert-warning">Producto no encontrado.</div>
+    <a href="suppliers">Volver al listado</a>
+}
+else
+{
+    <ProductForm Modelo="product" OnGuardar="GuardarAsync" OnCancelar="Volver" />
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Product? product;
+    public string? error;
+    private bool cargado;
+
+    protected override async Task OnInitializedAsync()
+    {
+        product = await Servicio.GetAsync(Id);
+        cargado = true;
+    }
+
+    private async Task GuardarAsync()
+    {
+        error = await Servicio.UpdateAsync(product!);
+        if (error is null) Volver();
+    }
+
+    private void Volver() => Nav.NavigateTo("/products");
+}

@@ -1,0 +1,110 @@
+@inject CategoryService CategoriaServicio
+@inject SupplierService ProveedorServicio
+
+<EditForm Model="Modelo" OnValidSubmit="OnGuardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="text-danger" />
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Código</label>
+            <InputText class="form-control" @bind-Value="Modelo.Code" />
+            <ValidationMessage For="() => Modelo.Code" />
+        </div>
+
+        <div class="col-md-8 mb-3">
+            <label class="form-label">Nombre</label>
+            <InputText class="form-control" @bind-Value="Modelo.Name" />
+            <ValidationMessage For="() => Modelo.Name" />
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Descripción</label>
+        <InputTextArea class="form-control" rows="3" @bind-Value="Modelo.Description" />
+        <ValidationMessage For="() => Modelo.Description" />
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Categoría</label>
+            <InputSelect class="form-select" @bind-Value="Modelo.CategoryId">
+                <option value="0">-- Selecciona una categoría --</option>
+                @foreach (var c in categories)
+                {
+                    <option value="@c.Id">@c.Name</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => Modelo.CategoryId" />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Proveedor</label>
+            <InputSelect class="form-select" @bind-Value="Modelo.SupplierId">
+                <option value="0">-- Selecciona un proveedor --</option>
+                @foreach (var p in suppliers)
+                {
+                    <option value="@p.Id">@p.Name</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => Modelo.SupplierId" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Precio de compra</label>
+            <InputNumber class="form-control" @bind-Value="Modelo.PurchasePrice" />
+            <ValidationMessage For="() => Modelo.PurchasePrice" />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Precio de venta</label>
+            <InputNumber class="form-control" @bind-Value="Modelo.SellingPrice" />
+            <ValidationMessage For="() => Modelo.SellingPrice" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">@(EsEdicion ? "Stock actual" : "Stock inicial")</label>
+            <InputNumber class="form-control" @bind-Value="Modelo.CurrentStock" disabled="@EsEdicion" />
+            <ValidationMessage For="() => Modelo.CurrentStock" />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Stock mínimo</label>
+            <InputNumber class="form-control" @bind-Value="Modelo.MinimumStock" />
+            <ValidationMessage For="() => Modelo.MinimumStock" />
+        </div>
+    </div>
+
+    <div class="form-check mb-3">
+        <InputCheckbox class="form-check-input" id="activo" @bind-Value="Modelo.Active" />
+        <label class="form-check-label" for="activo">Activo</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="button" class="btn btn-secondary" @onclick="OnCancelar">Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired] public Product Modelo { get; set; } = default!;
+    [Parameter] public bool EsEdicion { get; set; }
+    [Parameter] public EventCallback OnGuardar { get; set; }
+    [Parameter] public EventCallback OnCancelar { get; set; }
+
+    private List<Category> categories = [];
+    private List<Supplier> suppliers = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await CategoriaServicio.ListCategory();
+
+        var todos = await ProveedorServicio.ListAsync();
+        // Solo activos, pero conservando el del producto si se está editando
+        suppliers = todos
+            .Where(p => p.Active || p.Id == Modelo.SupplierId)
+            .ToList();
+    }
+}

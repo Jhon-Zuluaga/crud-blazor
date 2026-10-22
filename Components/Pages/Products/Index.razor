@@ -1,0 +1,91 @@
+@page "/products"
+@rendermode InteractiveServer
+@inject ProductService Servicio
+@inject IJSRuntime JS
+
+<PageTitle>Productos</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Productos</h1>
+    <a class="btn btn-primary" href="products/crear">Nuevo producto</a>
+</div>
+
+<input class="form-control mb-3" placeholder="Buscar por código..."
+       @bind="busqueda" @bind:event="oninput" @bind:after="CargarAsync" />
+
+@if (error is not null)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+@if (products is null)
+{
+    <p><em>Cargando...</em></p>
+}
+else if (products.Count == 0)
+{
+    <p>No hay proveedores para mostrar.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Proveedor</th>
+                <th>Precio venta</th>
+                <th>Stock</th>
+                <th>Estado</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Product p in products)
+            {
+                <tr>
+                    <td>@p.Code</td>
+                    <td>@p.Name</td>
+                    <td>@p.Category?.Name</td>
+                    <td>@p.Supplier?.Name</td>
+                    <td>@p.PurchasePrice.ToString("C")</td>
+                    <td>@p.CurrentStock
+                        @if (p.CurrentStock <= p.MinimumStock)
+                        {
+                            <span class="badge bg-warning text-dark ms-1">Stock bajo</span>
+                        }
+                    </td>
+                    <td>
+                        <span class="badge @(p.Active ? "bg-success" : "bg-secondary")">
+                            @(p.Active ? "Activo" : "Inactivo")
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-primary" href="products/editar/@p.Id">Editar</a>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => EliminarAsync(p)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Product>? products;
+    private string? busqueda;
+    private string? error;
+
+    protected override async Task OnInitializedAsync() => await CargarAsync();
+
+    private async Task CargarAsync() => products = await Servicio.ListProduct(busqueda);
+
+    private async Task EliminarAsync(Product p)
+    {
+        if (!await JS.InvokeAsync<bool>("confirm", $"¿Eliminar a {p.Name}?"))
+            return;
+
+        error = await Servicio.DeleteAsync(p.Id);
+        await CargarAsync();
+    }
+}
