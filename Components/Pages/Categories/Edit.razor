@@ -1,0 +1,42 @@
+@page "/categories/editar/{Id:int}"
+@rendermode InteractiveServer
+@inject CategoryService Servicio
+@inject NavigationManager Nav
+
+<PageTitle>Editar categoria</PageTitle>
+<h1>Editar categoria</h1>
+
+@if (!cargado)
+{
+    <p><em>Cargando...</em></p>
+}
+else if (category is null)
+{
+    <div class="alert alert-warning">Categoria no encontrado.</div>
+    <a href="categories">Volver al listado</a>
+}
+else
+{
+    <CategoryForm Modelo="category" OnGuardar="GuardarAsync" OnCancelar="Volver" />
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Category? category;
+    private bool cargado;
+
+    protected override async Task OnInitializedAsync()
+    {
+        category = await Servicio.GetAsync(Id);
+        cargado = true;
+    }
+
+    private async Task GuardarAsync()
+    {
+        await Servicio.updateAsync(category!);
+        Volver();
+    }
+
+    private void Volver() => Nav.NavigateTo("/categories");
+}

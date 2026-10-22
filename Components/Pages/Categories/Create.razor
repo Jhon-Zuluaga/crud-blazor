@@ -1,0 +1,21 @@
+@page "/categories/crear"
+@rendermode InteractiveServer
+@inject CategoryService Servicio
+@inject NavigationManager Nav
+
+<PageTitle>Nueva categoria</PageTitle>
+<h1>Nueva categoria</h1>
+
+<CategoryForm Modelo="category" OnGuardar="GuardarAsync" OnCancelar="Volver" />
+
+@code {
+    private readonly Category category = new();
+
+    private async Task GuardarAsync()
+    {
+        await Servicio.CreateAsync(category);
+        Volver();
+    }
+
+    private void Volver() => Nav.NavigateTo("/categories");
+}
