@@ -11,6 +11,7 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddScoped<SupplierService>();
+builder.Services.AddScoped<CategoryService>();
 
 var app = builder.Build();
 

@@ -1,0 +1,72 @@
+@page "/categories"
+@rendermode InteractiveServer
+@inject CategoryService Servicio
+@inject IJSRuntime JS
+
+<PageTitle>Categorias</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Categorias</h1>
+    <a class="btn btn-primary" href="categories/crear">Nueva categoria</a>
+</div>
+
+<input class="form-control mb-3" placeholder="Buscar por nombre..."
+       @bind="busqueda" @bind:event="oninput" @bind:after="CargarAsync" />
+
+@if (error is not null)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+@if (categories is null)
+{
+    <p><em>Cargando...</em></p>
+}
+else if (categories.Count == 0)
+{
+    <p>No hay categorias para mostrar.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripcion</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Category c in categories)
+            {
+                <tr>
+                    <td>@c.Name</td>
+                    <td>@c.Description</td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-primary" href="categories/editar/@c.Id">Editar</a>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => EliminarAsync(c)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Category>? categories;
+    private string? busqueda;
+    private string? error;
+
+    protected override async Task OnInitializedAsync() => await CargarAsync();
+
+    private async Task CargarAsync() => categories = await Servicio.ListCategory(busqueda);
+
+    private async Task EliminarAsync(Category c)
+    {
+        if (!await JS.InvokeAsync<bool>("confirm", $"¿Eliminar a {c.Name}?"))
+            return;
+
+        error = await Servicio.DeleteAsync(c.Id);
+        await CargarAsync();
+    }
+}
