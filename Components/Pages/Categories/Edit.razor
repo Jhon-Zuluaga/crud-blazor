@@ -6,7 +6,7 @@
 <PageTitle>Editar categoria</PageTitle>
 <h1>Editar categoria</h1>
 
-@if (!cargado)
+@if (!loaded)
 {
     <p><em>Cargando...</em></p>
 }
@@ -17,26 +17,26 @@ else if (category is null)
 }
 else
 {
-    <CategoryForm Modelo="category" OnGuardar="GuardarAsync" OnCancelar="Volver" />
+    <CategoryForm Modelo="category" OnSave="SaveAsync" OnCancel="Back" />
 }
 
 @code {
     [Parameter] public int Id { get; set; }
 
     private Category? category;
-    private bool cargado;
+    private bool loaded;
 
     protected override async Task OnInitializedAsync()
     {
         category = await Servicio.GetAsync(Id);
-        cargado = true;
+        loaded = true;
     }
 
-    private async Task GuardarAsync()
+    private async Task SaveAsync()
     {
         await Servicio.updateAsync(category!);
-        Volver();
+        Back();
     }
 
-    private void Volver() => Nav.NavigateTo("/categories");
+    private void Back() => Nav.NavigateTo("/categories");
 }

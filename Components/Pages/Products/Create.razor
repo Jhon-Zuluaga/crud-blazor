@@ -10,17 +10,17 @@
     <div class="alert alert-danger">@error</div>
 }
 
-<ProductForm Modelo="product" OnGuardar="GuardarAsync" OnCancelar="Volver" />
+<ProductForm Modelo="product" OnSave="SaveAsync" OnCancel="Back" />
 
 @code {
     private readonly Product product = new();
     private string? error;
 
-    private async Task GuardarAsync()
+    private async Task SaveAsync()
     {
         error = await Servicio.CreateAsync(product);
-        if (error is null) Volver();
+        if (error is null) Back();
     }
 
-    private void Volver() => Nav.NavigateTo("/products");
+    private void Back() => Nav.NavigateTo("/products");
 }

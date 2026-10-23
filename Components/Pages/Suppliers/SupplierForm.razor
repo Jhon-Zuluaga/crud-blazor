@@ -1,4 +1,4 @@
-<EditForm Model="Modelo" OnValidSubmit="OnGuardar">
+<EditForm Model="Modelo" OnValidSubmit="OnSave">
     <DataAnnotationsValidator />
     <ValidationSummary class="text-danger" />
 
@@ -37,11 +37,11 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Guardar</button>
-    <button type="button" class="btn btn-secondary" @onclick="OnCancelar">Cancelar</button>
+    <button type="button" class="btn btn-secondary" @onclick="OnCancel">Cancelar</button>
 </EditForm>
 
 @code {
     [Parameter, EditorRequired] public Supplier Modelo { get; set; } = default!;
-    [Parameter] public EventCallback OnGuardar { get; set; }
-    [Parameter] public EventCallback OnCancelar { get; set; }
+    [Parameter] public EventCallback OnSave{ get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
 }

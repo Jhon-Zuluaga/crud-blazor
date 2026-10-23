@@ -11,7 +11,7 @@
     <div class="alert alert-danger">@error</div>
 }
 
-@if (!cargado)
+@if (!loaded)
 {
     <p><em>Cargando...</em></p>
 }
@@ -22,7 +22,7 @@ else if (product is null)
 }
 else
 {
-    <ProductForm Modelo="product" OnGuardar="GuardarAsync" OnCancelar="Volver" />
+    <ProductForm Modelo="product" OnSave="SaveAsync" OnCancel="Back" />
 }
 
 @code {
@@ -30,19 +30,19 @@ else
 
     private Product? product;
     public string? error;
-    private bool cargado;
+    private bool loaded;
 
     protected override async Task OnInitializedAsync()
     {
         product = await Servicio.GetAsync(Id);
-        cargado = true;
+        loaded = true;
     }
 
-    private async Task GuardarAsync()
+    private async Task SaveAsync()
     {
         error = await Servicio.UpdateAsync(product!);
-        if (error is null) Volver();
+        if (error is null) Back();
     }
 
-    private void Volver() => Nav.NavigateTo("/products");
+    private void Back() => Nav.NavigateTo("/products");
 }

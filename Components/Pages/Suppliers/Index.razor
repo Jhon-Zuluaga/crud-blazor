@@ -11,7 +11,7 @@
 </div>
 
 <input class="form-control mb-3" placeholder="Buscar por nombre..."
-       @bind="busqueda" @bind:event="oninput" @bind:after="CargarAsync" />
+       @bind="search" @bind:event="oninput" @bind:after="UploadAsync" />
 
 @if (error is not null)
 {
@@ -54,7 +54,7 @@ else
                     </td>
                     <td class="text-end">
                         <a class="btn btn-sm btn-outline-primary" href="suppliers/editar/@p.Id">Editar</a>
-                        <button class="btn btn-sm btn-outline-danger" @onclick="() => EliminarAsync(p)">Eliminar</button>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteAsync(p)">Eliminar</button>
                     </td>
                 </tr>
             }
@@ -64,19 +64,19 @@ else
 
 @code {
     private List<Supplier>? suppliers;
-    private string? busqueda;
+    private string? search;
     private string? error;
 
-    protected override async Task OnInitializedAsync() => await CargarAsync();
+    protected override async Task OnInitializedAsync() => await UploadAsync();
 
-    private async Task CargarAsync() => suppliers = await Servicio.ListAsync(busqueda);
+    private async Task UploadAsync() => suppliers = await Servicio.ListAsync(search);
 
-    private async Task EliminarAsync(Supplier p)
+    private async Task DeleteAsync(Supplier p)
     {
         if (!await JS.InvokeAsync<bool>("confirm", $"¿Eliminar a {p.Name}?"))
             return;
 
         error = await Servicio.DeleteAsync(p.Id);
-        await CargarAsync();
+        await UploadAsync();
     }
 }
