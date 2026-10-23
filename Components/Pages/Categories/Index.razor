@@ -11,7 +11,7 @@
 </div>
 
 <input class="form-control mb-3" placeholder="Buscar por nombre..."
-       @bind="busqueda" @bind:event="oninput" @bind:after="CargarAsync" />
+       @bind="search" @bind:event="oninput" @bind:after="LoadAsync" />
 
 @if (error is not null)
 {
@@ -44,7 +44,7 @@ else
                     <td>@c.Description</td>
                     <td class="text-end">
                         <a class="btn btn-sm btn-outline-primary" href="categories/editar/@c.Id">Editar</a>
-                        <button class="btn btn-sm btn-outline-danger" @onclick="() => EliminarAsync(c)">Eliminar</button>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteAsync(c)">Eliminar</button>
                     </td>
                 </tr>
             }
@@ -54,19 +54,19 @@ else
 
 @code {
     private List<Category>? categories;
-    private string? busqueda;
+    private string? search;
     private string? error;
 
-    protected override async Task OnInitializedAsync() => await CargarAsync();
+    protected override async Task OnInitializedAsync() => await LoadAsync();
 
-    private async Task CargarAsync() => categories = await Servicio.ListCategory(busqueda);
+    private async Task LoadAsync() => categories = await Servicio.ListCategory(search);
 
-    private async Task EliminarAsync(Category c)
+    private async Task DeleteAsync(Category c)
     {
-        if (!await JS.InvokeAsync<bool>("confirm", $"¿Eliminar a {c.Name}?"))
+        if (!await JS.InvokeAsync<bool>("confirm", $"Eliminar a {c.Name}?"))
             return;
 
         error = await Servicio.DeleteAsync(c.Id);
-        await CargarAsync();
+        await LoadAsync();
     }
 }

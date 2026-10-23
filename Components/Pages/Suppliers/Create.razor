@@ -6,16 +6,16 @@
 <PageTitle>Nuevo proveedor</PageTitle>
 <h1>Nuevo proveedor</h1>
 
-<SupplierForm Modelo="supplier" OnGuardar="GuardarAsync" OnCancelar="Volver" />
+<SupplierForm Modelo="supplier" OnSave="SaveAsync" OnCancel="Back" />
 
 @code {
     private readonly Supplier supplier = new();
 
-    private async Task GuardarAsync()
+    private async Task SaveAsync()
     {
         await Servicio.CreateAsync(supplier);
-        Volver();
+        Back();
     }
 
-    private void Volver() => Nav.NavigateTo("/suppliers");
+    private void Back() => Nav.NavigateTo("/suppliers");
 }

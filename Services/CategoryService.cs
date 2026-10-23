@@ -11,7 +11,7 @@ public class CategoryService(IDbContextFactory<AppDbContext> factory)
         var query = db.Categories.AsNoTracking();
 
         if(!string.IsNullOrWhiteSpace(search))
-            query = query.Where(p => EF.Functions.ILike(p.Name, $"%{search}"));
+            query = query.Where(p => EF.Functions.ILike(p.Name, $"%{search}%"));
 
         return await query.OrderBy(p => p.Name).ToListAsync();
     }

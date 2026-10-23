@@ -6,7 +6,7 @@
 <PageTitle>Editar proveedor</PageTitle>
 <h1>Editar proveedor</h1>
 
-@if (!cargado)
+@if (!loaded)
 {
     <p><em>Cargando...</em></p>
 }
@@ -17,26 +17,26 @@ else if (supplier is null)
 }
 else
 {
-    <SupplierForm Modelo="supplier" OnGuardar="GuardarAsync" OnCancelar="Volver" />
+    <SupplierForm Modelo="supplier" OnSave="SaveAsync" OnCancel="Back" />
 }
 
 @code {
     [Parameter] public int Id { get; set; }
 
     private Supplier? supplier;
-    private bool cargado;
+    private bool loaded;
 
     protected override async Task OnInitializedAsync()
     {
         supplier = await Servicio.GetAsync(Id);
-        cargado = true;
+        loaded = true;
     }
 
-    private async Task GuardarAsync()
+    private async Task SaveAsync()
     {
         await Servicio.UpdateAsync(supplier!);
-        Volver();
+        Back();
     }
 
-    private void Volver() => Nav.NavigateTo("/suppliers");
+    private void Back() => Nav.NavigateTo("/suppliers");
 }

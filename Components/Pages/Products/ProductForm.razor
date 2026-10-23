@@ -1,7 +1,7 @@
 @inject CategoryService CategoriaServicio
 @inject SupplierService ProveedorServicio
 
-<EditForm Model="Modelo" OnValidSubmit="OnGuardar">
+<EditForm Model="Modelo" OnValidSubmit="OnSave">
     <DataAnnotationsValidator />
     <ValidationSummary class="text-danger" />
 
@@ -67,8 +67,8 @@
 
     <div class="row">
         <div class="col-md-6 mb-3">
-            <label class="form-label">@(EsEdicion ? "Stock actual" : "Stock inicial")</label>
-            <InputNumber class="form-control" @bind-Value="Modelo.CurrentStock" disabled="@EsEdicion" />
+            <label class="form-label">@(Edit ? "Stock actual" : "Stock inicial")</label>
+            <InputNumber class="form-control" @bind-Value="Modelo.CurrentStock" disabled="@Edit" />
             <ValidationMessage For="() => Modelo.CurrentStock" />
         </div>
 
@@ -85,14 +85,14 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Guardar</button>
-    <button type="button" class="btn btn-secondary" @onclick="OnCancelar">Cancelar</button>
+    <button type="button" class="btn btn-secondary" @onclick="OnCancel">Cancelar</button>
 </EditForm>
 
 @code {
     [Parameter, EditorRequired] public Product Modelo { get; set; } = default!;
-    [Parameter] public bool EsEdicion { get; set; }
-    [Parameter] public EventCallback OnGuardar { get; set; }
-    [Parameter] public EventCallback OnCancelar { get; set; }
+    [Parameter] public bool Edit { get; set; }
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
 
     private List<Category> categories = [];
     private List<Supplier> suppliers = [];

@@ -6,16 +6,16 @@
 <PageTitle>Nueva categoria</PageTitle>
 <h1>Nueva categoria</h1>
 
-<CategoryForm Modelo="category" OnGuardar="GuardarAsync" OnCancelar="Volver" />
+<CategoryForm Modelo="category" OnSave="SaveAsync" OnCancel="Back" />
 
 @code {
     private readonly Category category = new();
 
-    private async Task GuardarAsync()
+    private async Task SaveAsync()
     {
         await Servicio.CreateAsync(category);
-        Volver();
+        Back();
     }
 
-    private void Volver() => Nav.NavigateTo("/categories");
+    private void Back() => Nav.NavigateTo("/categories");
 }
