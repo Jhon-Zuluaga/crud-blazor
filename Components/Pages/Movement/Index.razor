@@ -1,0 +1,88 @@
+@page "/movements"
+@using crud_blazor.Services
+@rendermode InteractiveServer
+@inject InventoryMovementService Service
+@inject ProductService ProductService
+
+<PageTitle>Movimientos</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Movimientos de inventario</h1>
+    <a class="btn btn-primary" href="movements/register">Registrar movimiento</a>
+</div>
+
+<div class="mb-3">
+    <select class="form-select" @bind="productFilter" @bind:after="LoadAsync">
+        <option value="">Todos los productos</option>
+        @foreach (var p in products)
+        {
+            <option value="@p.Id">@p.Code - @p.Name</option>
+        }
+    </select>
+</div>
+
+@if (movements is null)
+{
+    <p><em>Cargando...</em></p>
+}
+else if (movements.Count == 0)
+{
+    <p>No hay movimientos para mostrar.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Producto</th>
+                <th>Tipo</th>
+                <th class="text-end">Cantidad</th>
+                <th>Motivo</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var m in movements)
+            {
+                <tr>
+                    <td>@m.Date.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@m.Product?.Code - @m.Product?.Name</td>
+                    <td>
+                        <span class="badge @TypeClass(m.type)">@TypeLabel(m.type)</span>
+                    </td>
+                    <td class="text-end">@m.Quantity</td>
+                    <td>@m.Reason</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<InventoryMovement>? movements;
+    private List<Product> products = [];
+    private int? productFilter;
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ProductService.ListProduct();
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync() =>
+        movements = await Service.ListAsync(productFilter);
+
+    private static string TypeClass(TransactionType type) => type switch
+    {
+        TransactionType.Entry => "bg-success",
+        TransactionType.Exit => "bg-danger",
+        _ => "bg-secondary"
+    };
+
+    private static string TypeLabel(TransactionType type) => type switch
+    {
+        TransactionType.Entry => "Entrada",
+        TransactionType.Exit => "Salida",
+        _ => "Ajuste"
+    };
+}
