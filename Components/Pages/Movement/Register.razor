@@ -1,0 +1,91 @@
+@page "/movements/register"
+@using crud_blazor.Services
+@rendermode InteractiveServer
+@inject InventoryMovementService Service
+@inject ProductService ProductService
+@inject NavigationManager Nav
+
+<PageTitle>Registrar movimiento</PageTitle>
+<h1>Registrar movimiento</h1>
+
+@if (error is not null)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<EditForm Model="movement" OnValidSubmit="SaveAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="text-danger" />
+
+    <div class="mb-3">
+        <label class="form-label">Producto</label>
+        <InputSelect class="form-select" @bind-Value="movement.ProductId">
+            <option value="0">-- Selecciona un producto --</option>
+            @foreach (var p in products)
+            {
+                <option value="@p.Id">@p.Code - @p.Name</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="() => movement.ProductId" />
+
+        @if (selectedProduct is not null)
+        {
+            <div class="form-text">
+                Stock actual: <strong>@selectedProduct.CurrentStock</strong>
+            </div>
+        }
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Tipo</label>
+            <InputSelect class="form-select" @bind-Value="movement.type">
+                <option value="@TransactionType.Entry">Entrada</option>
+                <option value="@TransactionType.Exit">Salida</option>
+            </InputSelect>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Cantidad</label>
+            <InputNumber class="form-control" @bind-Value="movement.Quantity" />
+            <ValidationMessage For="() => movement.Quantity" />
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Motivo</label>
+        <InputText class="form-control" @bind-Value="movement.Reason" />
+        <ValidationMessage For="() => movement.Reason" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Registrar</button>
+    <button type="button" class="btn btn-secondary" @onclick="GoBack">Cancelar</button>
+</EditForm>
+
+@code {
+    [SupplyParameterFromQuery] public int? ProductId { get; set; }
+
+    private readonly InventoryMovement movement = new() { type = TransactionType.Entry };
+    private List<Product> products = [];
+    private string? error;
+
+    private Product? selectedProduct =>
+        products.FirstOrDefault(p => p.Id == movement.ProductId);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var all = await ProductService.ListProduct();
+        products = all.Where(p => p.Active).ToList();
+
+        if (ProductId is not null)
+            movement.ProductId = ProductId.Value;
+    }
+
+    private async Task SaveAsync()
+    {
+        error = await Service.RegisterAsync(movement);
+        if (error is null) GoBack();
+    }
+
+    private void GoBack() => Nav.NavigateTo("/movements");
+}

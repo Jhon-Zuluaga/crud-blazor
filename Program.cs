@@ -1,4 +1,5 @@
 using crud_blazor.Components;
+using crud_blazor.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,7 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
 builder.Services.AddScoped<SupplierService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<InventoryMovementService>();
 
 var app = builder.Build();
 
